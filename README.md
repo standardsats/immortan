@@ -1,6 +1,4 @@
-<a href="https://nbd.wtf"><img align="right" height="196" src="https://user-images.githubusercontent.com/1653275/194609043-0add674b-dd40-41ed-986c-ab4a2e053092.png" /></a>
-
-# IMMORTAN
+# Immortan: Mobile-Optimized Lightning Node Implementation
 
 Immortan is a minimal, privacy-focused, opinionated LN protocol implementation aimed to specifically power lite LN nodes which are mostly to be found on mobile phones or desktop computers and only run private channels.
 
@@ -27,7 +25,7 @@ Existing implementations are of general purpose, that is, they neither address s
 Install it by adding to your `build.sbt`:
 
 ```sbt
-libraryDependencies += "com.fiatjaf" %% "immortan" % "0.7.8"
+libraryDependencies += "finance.standardsats" %% "immortan" % "0.7.8"
 ```
 
 ### Very dense and confusing guide
@@ -62,3 +60,8 @@ Or maybe start here at [LNParams](https://javadoc.io/doc/com.fiatjaf/immortan_2.
 - [Cliché](https://github.com/fiatjaf/cliche), a lightweight node daemon to be embedded into applications
 - The seamless hosted fiat channels provider [StandardSats](https://github.com/standardsats/wallet) wallet
 - [Simple Bitcoin Wallet](https://github.com/btcontract/wallet), the wallet that started it all, now abandoned
+
+## Credits:
+
+* [Anton Kumaigorodski](https://github.com/akumaigorodski), creator
+* [Fiatjaf](https://github.com/fiatjaf), maintainer

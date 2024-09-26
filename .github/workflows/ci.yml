@@ -1,0 +1,17 @@
+name: Continuous integration
+on: push
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3 # Retrieve the content of the repository
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-java@v3 # Set up a jdk
+        with:
+          distribution: temurin
+          java-version: 11
+          cache: sbt # Cache the artifacts downloaded by sbt accross CI runs
+      - name: unit tests # Custom action consisting of a shell command
+        run: sbt +test

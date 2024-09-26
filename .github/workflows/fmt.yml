@@ -1,4 +1,4 @@
-name: check if code is properly formatted
+name: Check if code is properly formatted
 on: [push]
 
 jobs:
