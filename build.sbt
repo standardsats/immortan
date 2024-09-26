@@ -1,5 +1,5 @@
 name := "immortan"
-version := "0.1.1-SNAPSHOT"
+version := "0.7.13-SNAPSHOT"
 scalaVersion := "2.13.8"
 organization := "finance.standardsats"
 
