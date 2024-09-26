@@ -1,8 +1,8 @@
 name := "immortan"
-organization := "finance.standardsats"
+version := "0.1.1-SNAPSHOT"
 scalaVersion := "2.13.8"
-version := "0.7.13-SNAPSHOT"
-sonatypeProfileName := "com.fiatjaf"
+organization := "finance.standardsats"
+
 homepage := Some(url("https://github.com/fiatjaf/immortan"))
 scmInfo := Some(
   ScmInfo(
@@ -15,8 +15,8 @@ developers := List(
   Developer(
     id = "standardsats",
     name = "standardsats",
-    email = "foss@standardsats.finance",
-    url = url("https://https://standardsats.github.io")
+    email = "ievdokimov@pm.me",
+    url = url("https://standardsats.github.io")
   ),
   Developer(
     id = "fiatjaf",
@@ -31,9 +31,7 @@ developers := List(
     url = url("https://sbw.app/")
   )
 )
-publishMavenStyle := true
-publishTo := sonatypePublishToBundle.value
-sonatypeCredentialHost := "s01.oss.sonatype.org"
+
 libraryDependencies ++= Seq(
   "com.google.guava" % "guava" % "31.1-jre",
   "org.scala-lang.modules" % "scala-parser-combinators_2.13" % "2.1.0",
@@ -59,3 +57,15 @@ testFrameworks += new TestFramework("utest.runner.Framework")
 Compile / packageBin / packageOptions += Package.ManifestAttributes(
   "Automatic-Module-Name" -> "immortan"
 )
+
+pgpSigningKey := Credentials.forHost(credentials.value, "gpg").map(_.userName)
+
+publishTo := {
+  val nexus = "https://s01.oss.sonatype.org/"
+  if (version.value.endsWith("-SNAPSHOT"))
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
+
+publishMavenStyle := false
+credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credentials")

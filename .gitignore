@@ -11,4 +11,3 @@ debug.log
 project/metals.sbt
 project/project
 data/
-.sbt/
