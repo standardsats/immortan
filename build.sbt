@@ -60,12 +60,6 @@ Compile / packageBin / packageOptions += Package.ManifestAttributes(
 
 pgpSigningKey := Credentials.forHost(credentials.value, "gpg").map(_.userName)
 
-publishTo := {
-  val nexus = "https://s01.oss.sonatype.org/"
-  if (version.value.endsWith("-SNAPSHOT"))
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
-
-publishMavenStyle := false
-credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credentials")
+publishTo := sonatypePublishToBundle.value
+sonatypeCredentialHost := "s01.oss.sonatype.org"
+publishMavenStyle := true
