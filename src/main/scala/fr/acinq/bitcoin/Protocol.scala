@@ -214,12 +214,12 @@ object Protocol {
     writeBytes(input, out)
   }
 
-  implicit val txInSer = TxIn
-  implicit val txOutSer = TxOut
-  implicit val scriptWitnessSer = ScriptWitness
-  implicit val txSer = Transaction
-  implicit val networkAddressWithTimestampSer = NetworkAddressWithTimestamp
-  implicit val inventoryVectorOutSer = InventoryVector
+  implicit val txInSer: TxIn.type = TxIn
+  implicit val txOutSer: TxOut.type = TxOut
+  implicit val scriptWitnessSer: ScriptWitness.type = ScriptWitness
+  implicit val txSer: Transaction.type = Transaction
+  implicit val networkAddressWithTimestampSer: NetworkAddressWithTimestamp.type = NetworkAddressWithTimestamp
+  implicit val inventoryVectorOutSer: InventoryVector.type = InventoryVector
 
   def readCollection[T](
       input: InputStream,
