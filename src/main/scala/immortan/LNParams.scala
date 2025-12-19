@@ -108,7 +108,7 @@ object LNParams {
   var feeRates: FeeRates = _
 
   var threadPool = Executors.newFixedThreadPool(3)
-  implicit val ec = new ExecutionContext {
+  implicit val ec: ExecutionContext = new ExecutionContext {
     def execute(runnable: Runnable): Unit = threadPool.submit(runnable)
     def reportFailure(t: Throwable): Unit = {}
   }
