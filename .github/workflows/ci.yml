@@ -8,12 +8,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 11
           cache: maven
+
       - name: test compile
         run: mvn clean test-compile dependency:build-classpath
+
       - name: unit tests
         run: mvn test -Dtest=testrunner.UTestRunner
