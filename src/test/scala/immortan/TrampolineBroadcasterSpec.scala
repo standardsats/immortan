@@ -20,7 +20,7 @@ object TrampolineBroadcasterSpec extends TestSuite {
   val tests = Tests {
     test("Broadcast routable amounts to peers") {
       LNParams.secret = WalletSecret.random()
-      LNParams.trampoline = TrampolineOn(
+      val initialTrampoline = TrampolineOn(
         LNParams.minPayment,
         Long.MaxValue.msat,
         feeProportionalMillionths = 1000L,
@@ -28,6 +28,7 @@ object TrampolineBroadcasterSpec extends TestSuite {
         logExponent = 0.0,
         LNParams.minRoutingCltvExpiryDelta
       )
+      LNParams.trampoline = initialTrampoline
       val (_, _, cm) = makeChannelMaster(Seq(randomBytes32))
       val hcs1 =
         makeHostedCommits(
@@ -50,7 +51,7 @@ object TrampolineBroadcasterSpec extends TestSuite {
         ): Unit = sendings += msg.get
       }
 
-      broadcaster process RoutingOn(LNParams.trampoline)
+      broadcaster process RoutingOn(initialTrampoline)
       WAIT_UNTIL_TRUE(
         broadcaster.state == TrampolineBroadcaster.RoutingEnabled
       )
@@ -100,7 +101,8 @@ object TrampolineBroadcasterSpec extends TestSuite {
       sendings.clear()
 
       // User has changed settings
-      broadcaster process RoutingOn(LNParams.trampoline.copy(exponent = 10))
+      val updatedTrampoline = initialTrampoline.copy(exponent = 10)
+      broadcaster process RoutingOn(updatedTrampoline)
       broadcaster process TrampolineBroadcaster.CMDBroadcast
       WAIT_UNTIL_TRUE(sendings.size == 2)
       val TrampolineStatusUpdate(
@@ -129,7 +131,7 @@ object TrampolineBroadcasterSpec extends TestSuite {
       sendings.clear()
 
       // User wants to route again
-      broadcaster process RoutingOn(LNParams.trampoline)
+      broadcaster process RoutingOn(initialTrampoline)
       broadcaster process TrampolineBroadcaster.CMDBroadcast
       WAIT_UNTIL_TRUE(sendings.size == 2)
       val TrampolineStatusInit(
