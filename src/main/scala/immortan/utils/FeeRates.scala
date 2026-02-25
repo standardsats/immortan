@@ -6,6 +6,7 @@ import immortan.crypto.CanBeShutDown
 import immortan.utils.FeeRates._
 import immortan.utils.ImplicitJsonFormats._
 import immortan.{DataBag, LNParams}
+import scala.math.BigDecimal.RoundingMode
 
 object FeeRates {
   val minPerKw: FeeratePerKw = FeeratePerKw(1000L.sat)
@@ -105,7 +106,7 @@ trait FeeRatesProvider {
 // Esplora
 
 class EsploraFeeProvider(val url: String) extends FeeRatesProvider {
-  type EsploraFeeStructure = Map[String, Long]
+  type EsploraFeeStructure = Map[String, BigDecimal]
 
   def provide: FeeratesPerKB = {
     val structure =
@@ -130,8 +131,15 @@ class EsploraFeeProvider(val url: String) extends FeeRatesProvider {
       structure: EsploraFeeStructure,
       maxBlockDelay: Int
   ): FeeratePerKB = {
-    val belowLimit = structure.view.filterKeys(_.toInt <= maxBlockDelay).values
-    FeeratePerKB(belowLimit.min.sat * 1000L)
+    val satPerVByte = structure.collect {
+      case (target, feerate) if target.toInt <= maxBlockDelay => feerate
+    }.min
+    val satPerKB =
+      (satPerVByte * BigDecimal(1000))
+        .setScale(0, RoundingMode.CEILING)
+        .toLong
+        .max(1L)
+    FeeratePerKB(satPerKB.sat)
   }
 }
 
