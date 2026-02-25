@@ -1,7 +1,6 @@
 package immortan.fsm
 
 import fr.acinq.bitcoin.{ByteVector32, Satoshi}
-import fr.acinq.eclair.Features.StaticRemoteKey
 import fr.acinq.eclair._
 import fr.acinq.eclair.blockchain.fee.FeeratePerKw
 import fr.acinq.eclair.channel._
@@ -58,7 +57,11 @@ abstract class NCFunderOpenHandler(
       ): Unit = {
         val localFunderParams =
           LNParams.makeChannelParams(isFunder = true, fundingAmount)
-        val channelFeatures = ChannelFeatures(StaticRemoteKey)
+        val channelFeatures =
+          ChannelFeatures.pickChannelFeatures(
+            LNParams.ourInit.features,
+            theirInit.features
+          )
 
         val initialFeeratePerKw =
           LNParams.feeRates.info.onChainFeeConf.feeEstimator.getFeeratePerKw(

@@ -630,6 +630,17 @@ case class ChannelReserveTooHigh(
     s"DustLimitTooSmall, reserveToFundingRatio=$reserveToFundingRatio, maxReserveToFundingRatio=$maxReserveToFundingRatio"
 }
 
+case class MissingChannelType(channelId: ByteVector32) extends RuntimeException {
+  override def toString: String = "MissingChannelType"
+}
+
+case class InvalidChannelType(
+    channelId: ByteVector32,
+    channelType: ChannelType
+) extends RuntimeException {
+  override def toString: String = s"InvalidChannelType, channelType=$channelType"
+}
+
 case class ExpiredHtlcInNormalChannel(
     channelId: ByteVector32,
     sentExpiredRouted: Boolean,

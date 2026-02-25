@@ -1,6 +1,5 @@
 package immortan.fsm
 
-import fr.acinq.eclair.Features.StaticRemoteKey
 import fr.acinq.eclair.channel._
 import fr.acinq.eclair.wire._
 import immortan.Channel
@@ -50,7 +49,11 @@ abstract class NCFundeeOpenHandler(
         info.safeAlias,
         localParams,
         theirInit,
-        ChannelFeatures(StaticRemoteKey),
+        ChannelFeatures.pickChannelFeatures(
+          LNParams.ourInit.features,
+          theirInit.features,
+          theirOpen.channelType_opt
+        ),
         theirOpen
       )
     }
