@@ -648,23 +648,24 @@ object MPPSpec extends TestSuite {
       )
 
       cm.opm.createSenderFSM(Set(noopListener), tag1)
-      cm.opm process send1
-
       cm.opm.createSenderFSM(Set(noopListener), tag2)
-      cm.opm process send2
-
       cm.opm.createSenderFSM(Set(noopListener), tag3)
+
+      cm.opm process send1
+      cm.opm process send2
       cm.opm process send3
 
       WAIT_UNTIL_TRUE {
+        val senders = cm.opm.data.paymentSenders
+
         // First one enjoys full channel capacity
-        val ws1 = cm.opm.data.paymentSenders(tag1).data.parts.values.collect {
+        val ws1 = senders.get(tag1).toList.flatMap(_.data.parts.values).collect {
           case inFlight: WaitForRouteOrInFlight => inFlight
         }
         assert(Set(MilliSatoshi(300000L)) == ws1.map(_.amount).toSet)
 
         // Second one had to be split to get through
-        val ws2 = cm.opm.data.paymentSenders(tag2).data.parts.values.collect {
+        val ws2 = senders.get(tag2).toList.flatMap(_.data.parts.values).collect {
           case inFlight: WaitForRouteOrInFlight => inFlight
         }
         assert(
@@ -676,7 +677,7 @@ object MPPSpec extends TestSuite {
         )
 
         // Third one has been knocked out
-        cm.opm.data.paymentSenders(tag3).state == PaymentStatus.ABORTED
+        senders.get(tag3).forall(_.state == PaymentStatus.ABORTED)
       }
     }
 
