@@ -1,7 +1,6 @@
 package immortan
 
 import java.net.Socket
-import scala.util.Try
 import fr.acinq.bitcoin._
 import fr.acinq.eclair.blockchain.fee.{
   FeeratePerKB,

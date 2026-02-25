@@ -408,7 +408,7 @@ class SyncParams {
     PublicKey(
       hex"03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f"
     ),
-    NodeAddress.unresolved(9735, host = 34, 239, 230, 56),
+    Domain("node.acinq.co", 9735),
     "ACINQ"
   )
   val syncNodes: Set[RemoteNodeInfo] = Set(
