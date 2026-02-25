@@ -1,5 +1,7 @@
 package fr.acinq.eclair.wire
 
+import fr.acinq.eclair.channel.{ChannelType, ChannelTypes}
+import fr.acinq.eclair.Features
 import fr.acinq.eclair.UInt64
 import fr.acinq.eclair.wire.CommonCodecs._
 import fr.acinq.eclair.wire.TlvCodecs.tlvStream
@@ -21,6 +23,22 @@ object ChannelTlv {
     val isEmpty: Boolean = script.isEmpty
   }
 
+  /** A channel type is a set of even feature bits that represent persistent
+    * channel features.
+    */
+  case class ChannelTypeTlv(channelType: ChannelType)
+      extends OpenChannelTlv
+      with AcceptChannelTlv
+
+  val channelTypeCodec: Codec[ChannelTypeTlv] =
+    variableSizeBytesLong(varintoverflow, bytes).xmap[ChannelTypeTlv](
+      b =>
+        ChannelTypeTlv(
+          ChannelTypes.fromFeatures(Features(b).initFeatures())
+        ),
+      tlv => tlv.channelType.featureBits.toByteVector
+    )
+
 }
 
 object OpenChannelTlv {
@@ -33,6 +51,7 @@ object OpenChannelTlv {
       .\(UInt64(0)) { case v: UpfrontShutdownScript => v }(
         variableSizeBytesLong(varintoverflow, bytes).as[UpfrontShutdownScript]
       )
+      .\(UInt64(1)) { case v: ChannelTypeTlv => v }(channelTypeCodec)
   )
 
 }
@@ -44,13 +63,9 @@ object AcceptChannelTlv {
   val acceptTlvCodec: Codec[TlvStream[AcceptChannelTlv]] = tlvStream(
     discriminated[AcceptChannelTlv]
       .by(varint)
-      .subcaseP(UInt64(0))(toUpfrontShutdownScript)(
+      .\(UInt64(0)) { case v: UpfrontShutdownScript => v }(
         variableSizeBytesLong(varintoverflow, bytes).as[UpfrontShutdownScript]
       )
+      .\(UInt64(1)) { case v: ChannelTypeTlv => v }(channelTypeCodec)
   )
-
-  def toUpfrontShutdownScript
-      : PartialFunction[AcceptChannelTlv, UpfrontShutdownScript] = {
-    case v: UpfrontShutdownScript => v
-  }
 }

@@ -20,6 +20,17 @@ import scala.util.Try
 
 object Helpers {
   def validateParamsFundee(open: OpenChannel, commits: NormalCommits): Unit = {
+    (open.channelType_opt, commits.channelFeatures.channelType_opt) match {
+      case (None, None) => ()
+      case (Some(proposed: SupportedChannelType), Some(local))
+          if proposed == local =>
+        ()
+      case (Some(proposed), _) =>
+        throw InvalidChannelType(open.temporaryChannelId, proposed)
+      case _ =>
+        throw MissingChannelType(open.temporaryChannelId)
+    }
+
     val reserveToFundingRatio =
       open.channelReserveSatoshis.toLong.toDouble / Math.max(
         open.fundingSatoshis.toLong,
@@ -114,6 +125,17 @@ object Helpers {
   }
 
   def validateParamsFunder(open: OpenChannel, accept: AcceptChannel): Unit = {
+    (open.channelType_opt, accept.channelType_opt) match {
+      case (None, None) => ()
+      case (Some(proposed: SupportedChannelType), Some(received))
+          if proposed == received =>
+        ()
+      case (Some(_), Some(received)) =>
+        throw InvalidChannelType(accept.temporaryChannelId, received)
+      case _ =>
+        throw MissingChannelType(accept.temporaryChannelId)
+    }
+
     val reserveToFundingRatio =
       accept.channelReserveSatoshis.toLong.toDouble / Math.max(
         open.fundingSatoshis.toLong,

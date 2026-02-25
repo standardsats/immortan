@@ -227,12 +227,33 @@ object Features {
     val mandatory = 18
   }
 
+  case object AnchorOutputs
+      extends Feature
+      with InitFeature
+      with NodeFeature {
+    val rfcName = "Anchor outputs (legacy)"
+    val mandatory = 20
+  }
+
+  case object AnchorOutputsZeroFeeHtlcTx
+      extends Feature
+      with InitFeature
+      with NodeFeature {
+    val rfcName = "Anchor outputs zero-fee htlc tx"
+    val mandatory = 22
+  }
+
   case object ShutdownAnySegwit
       extends Feature
       with InitFeature
       with NodeFeature {
     val rfcName = "Any shutdown script"
     val mandatory = 26
+  }
+
+  case object ChannelType extends Feature with InitFeature with NodeFeature {
+    val rfcName = "Channel type"
+    val mandatory = 44
   }
 
   case object OnionMessages extends Feature with InitFeature with NodeFeature {
@@ -291,8 +312,11 @@ object Features {
     BasicMultiPartPayment,
     Wumbo,
     StaticRemoteKey,
+    AnchorOutputs,
+    AnchorOutputsZeroFeeHtlcTx,
     ShutdownAnySegwit,
     OnionMessages,
+    ChannelType,
     PaymentMetadata,
     TrampolinePayment,
     HostedChannels,

@@ -2,6 +2,7 @@ package fr.acinq.eclair.wire
 
 import fr.acinq.bitcoin.Crypto.{PrivateKey, PublicKey}
 import fr.acinq.bitcoin.{ByteVector32, ByteVector64, Crypto, Protocol, Satoshi}
+import fr.acinq.eclair.channel.ChannelType
 import fr.acinq.eclair._
 import fr.acinq.eclair.blockchain.fee.FeeratePerKw
 import fr.acinq.eclair.payment.Bolt11Invoice.ExtraHop
@@ -86,7 +87,11 @@ case class OpenChannel(
     firstPerCommitmentPoint: PublicKey,
     channelFlags: Byte,
     tlvStream: TlvStream[OpenChannelTlv] = TlvStream.empty
-) extends HasTemporaryChannelId
+) extends HasTemporaryChannelId {
+  val channelType_opt: Option[ChannelType] = tlvStream.records.collectFirst {
+    case ChannelTlv.ChannelTypeTlv(channelType) => channelType
+  }
+}
 
 case class AcceptChannel(
     temporaryChannelId: ByteVector32,
@@ -104,7 +109,11 @@ case class AcceptChannel(
     htlcBasepoint: PublicKey,
     firstPerCommitmentPoint: PublicKey,
     tlvStream: TlvStream[AcceptChannelTlv] = TlvStream.empty
-) extends HasTemporaryChannelId
+) extends HasTemporaryChannelId {
+  val channelType_opt: Option[ChannelType] = tlvStream.records.collectFirst {
+    case ChannelTlv.ChannelTypeTlv(channelType) => channelType
+  }
+}
 
 case class FundingCreated(
     temporaryChannelId: ByteVector32,

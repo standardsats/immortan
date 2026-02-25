@@ -83,9 +83,10 @@ abstract class ChannelNormal(bag: ChannelBag) extends Channel {
           delayedPaymentKey,
           htlcKey
         ) = init.localParams.keys
-        val emptyUpfrontShutdown: TlvStream[OpenChannelTlv] = TlvStream(
-          ChannelTlv UpfrontShutdownScript ByteVector.empty
-        )
+        val openTlvs: Seq[OpenChannelTlv] =
+          Seq(ChannelTlv.UpfrontShutdownScript(ByteVector.empty)) ++
+            init.channelFeatures.channelType_opt.map(ChannelTlv.ChannelTypeTlv)
+        val openTlvStream: TlvStream[OpenChannelTlv] = TlvStream(openTlvs: _*)
 
         val open = OpenChannel(
           LNParams.chainHash,
@@ -106,7 +107,7 @@ abstract class ChannelNormal(bag: ChannelBag) extends Channel {
           htlcBasepoint = htlcKey.publicKey,
           init.localParams.keys.commitmentPoint(index = 0L),
           init.channelFlags,
-          emptyUpfrontShutdown
+          openTlvStream
         )
 
         BECOME(DATA_WAIT_FOR_ACCEPT_CHANNEL(init, open), Channel.WaitForAccept)
@@ -281,9 +282,11 @@ abstract class ChannelNormal(bag: ChannelBag) extends Channel {
           delayedPaymentKey,
           htlcKey
         ) = init.localParams.keys
-        val emptyUpfrontShutdown: TlvStream[AcceptChannelTlv] = TlvStream(
-          ChannelTlv UpfrontShutdownScript ByteVector.empty
-        )
+        val acceptTlvs: Seq[AcceptChannelTlv] =
+          Seq(ChannelTlv.UpfrontShutdownScript(ByteVector.empty)) ++
+            init.channelFeatures.channelType_opt.map(ChannelTlv.ChannelTypeTlv)
+        val acceptTlvStream: TlvStream[AcceptChannelTlv] =
+          TlvStream(acceptTlvs: _*)
 
         val accept = AcceptChannel(
           init.theirOpen.temporaryChannelId,
@@ -300,7 +303,7 @@ abstract class ChannelNormal(bag: ChannelBag) extends Channel {
           delayedPaymentBasepoint = delayedPaymentKey.publicKey,
           htlcBasepoint = htlcKey.publicKey,
           init.localParams.keys.commitmentPoint(index = 0L),
-          emptyUpfrontShutdown
+          acceptTlvStream
         )
 
         BECOME(

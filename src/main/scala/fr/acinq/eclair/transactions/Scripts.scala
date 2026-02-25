@@ -22,7 +22,8 @@ import fr.acinq.bitcoin._
 import fr.acinq.eclair.transactions.Transactions.{
   AnchorOutputsCommitmentFormat,
   CommitmentFormat,
-  DefaultCommitmentFormat
+  DefaultCommitmentFormat,
+  ZeroFeeHtlcTxAnchorOutputsCommitmentFormat
 }
 import fr.acinq.eclair.{CltvExpiry, CltvExpiryDelta}
 import scodec.bits.ByteVector
@@ -45,7 +46,8 @@ object Scripts {
   private def htlcRemoteSighash(commitmentFormat: CommitmentFormat): Int =
     commitmentFormat match {
       case DefaultCommitmentFormat => SIGHASH_ALL
-      case AnchorOutputsCommitmentFormat =>
+      case AnchorOutputsCommitmentFormat |
+          ZeroFeeHtlcTxAnchorOutputsCommitmentFormat =>
         SIGHASH_SINGLE | SIGHASH_ANYONECANPAY
     }
 
@@ -251,7 +253,9 @@ object Scripts {
   ): Seq[ScriptElt] = {
     val addCsvDelay = commitmentFormat match {
       case DefaultCommitmentFormat       => false
-      case AnchorOutputsCommitmentFormat => true
+      case AnchorOutputsCommitmentFormat |
+          ZeroFeeHtlcTxAnchorOutputsCommitmentFormat =>
+        true
     }
     // @formatter:off
     // To you with revocation key
@@ -332,7 +336,9 @@ object Scripts {
   ): Seq[ScriptElt] = {
     val addCsvDelay = commitmentFormat match {
       case DefaultCommitmentFormat       => false
-      case AnchorOutputsCommitmentFormat => true
+      case AnchorOutputsCommitmentFormat |
+          ZeroFeeHtlcTxAnchorOutputsCommitmentFormat =>
+        true
     }
     // @formatter:off
     // To you with revocation key
