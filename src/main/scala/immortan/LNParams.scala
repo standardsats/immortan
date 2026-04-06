@@ -125,9 +125,18 @@ object LNParams {
   val blockCount: AtomicLong = new AtomicLong(0L)
 
   def isOperational: Boolean =
-    null != chainHash && null != secret && null != chainWallets && connectionProvider != null &&
-      null != syncParams && null != trampoline && null != fiatRates && null != feeRates && null != cm &&
-      null != cm.inProcessors && null != cm.sendTo && null != logBag && null != routerConf && null != ourInit
+    Option(chainHash).isDefined &&
+      Option(secret).isDefined &&
+      Option(chainWallets).isDefined &&
+      Option(connectionProvider).isDefined &&
+      Option(syncParams).isDefined &&
+      Option(trampoline).isDefined &&
+      Option(fiatRates).isDefined &&
+      Option(feeRates).isDefined &&
+      Option(logBag).isDefined &&
+      Option(routerConf).isDefined &&
+      Option(ourInit).isDefined &&
+      Option(cm).exists(c => c.inProcessors != null && c.sendTo != null)
 
   def createInit: Init = {
     val networks: InitTlv = InitTlv.Networks(chainHash :: Nil)
