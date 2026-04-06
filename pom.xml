@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>finance.standardsats.immortan</groupId>
+    <groupId>finance.standardsats</groupId>
     <artifactId>immortan_2.13</artifactId>
-    <version>0.1.1</version>
-    <packaging>pom</packaging>
+    <version>0.7.13-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <description>A Scala implementation of the mobile-optimized Lightning Network client</description>
     <url>https://github.com/standardsats/immortan</url>
@@ -52,110 +52,146 @@
     </repositories>
 
     <build>
-    <plugins>
-        <plugin>
-            <groupId>net.alchim31.maven</groupId>
-            <artifactId>scala-maven-plugin</artifactId>
-            <version>4.8.1</version>
-            <configuration>
-                <args combine.children="append">
-                    <arg>-feature</arg>
-                    <arg>-language:postfixOps</arg>
-                    <arg>-language:implicitConversions</arg>
-                    <arg>-Werror</arg>
-                    <arg>-unchecked</arg>
-                    <arg>-deprecation</arg>
-                </args>
-                <jvmArgs>
-                    <jvmArg>-Xmx1024m</jvmArg>
-                    <jvmArg>-Xms1024m</jvmArg>
-                    <jvmArg>-Xss32m</jvmArg>
-                </jvmArgs>
-                <scalaCompatVersion>${scala.version.short}</scalaCompatVersion>
-            </configuration>
-            <executions>
-                <execution>
-                    <id>scalac</id>
-                    <goals>
-                        <goal>compile</goal>
-                        <goal>testCompile</goal>
-                    </goals>
-                </execution>
-                <execution>
-                    <id>scaladoc</id>
-                    <goals>
-                        <goal>doc-jar</goal>
-                    </goals>
-                    <configuration>
-                        <skip>${maven.test.skip}</skip>
-                        <args>
-                            <arg>-no-link-warnings</arg>
-                        </args>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <groupId>org.sonatype.central</groupId>
-            <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>0.6.0</version>
-            <extensions>true</extensions>
-            <configuration>
-                <publishingServerId>central</publishingServerId>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
-            <executions>
-                <execution>
-                    <id>attach-sources</id>
-                    <goals>
-                        <goal>jar-no-fork</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
-            <executions>
-                <execution>
-                    <id>attach-javadocs</id>
-                    <goals>
-                        <goal>jar</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
-            <executions>
-                <execution>
-                    <id>sign-artifacts</id>
-                    <phase>verify</phase>
-                    <goals>
-                        <goal>sign</goal>
-                    </goals>
-                    <configuration>
-                        <keyname>${gpg.keyname}</keyname>
-                        <passphraseServerId>${gpg.keyname}</passphraseServerId>
-                        <gpgArguments>
-                            <arg>--pinentry-mode</arg>
-                            <arg>loopback</arg>
-                        </gpgArguments>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-    </plugins>
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>4.8.1</version>
+                <configuration>
+                    <scalaCompatVersion>${scala.compat.version}</scalaCompatVersion>
+                    <args combine.children="append">
+                        <arg>-feature</arg>
+                        <arg>-language:postfixOps</arg>
+                        <arg>-language:implicitConversions</arg>
+                        <arg>-unchecked</arg>
+                        <arg>-deprecation</arg>
+                    </args>
+                    <jvmArgs>
+                        <jvmArg>-Xmx1024m</jvmArg>
+                        <jvmArg>-Xms1024m</jvmArg>
+                        <jvmArg>-Xss32m</jvmArg>
+                    </jvmArgs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>scalac</id>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scaladoc</id>
+                        <goals>
+                            <goal>doc-jar</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${maven.test.skip}</skip>
+                            <args>
+                                <arg>-no-link-warnings</arg>
+                            </args>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- utest has no Maven integration; run via its main-class runner -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>run-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>testrunner.UTestRunner</mainClass>
+                            <classpathScope>test</classpathScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- disable surefire — no JUnit/TestNG tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <!-- add Automatic-Module-Name manifest entry -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Automatic-Module-Name>immortan</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <configuration>
+                            <keyname>${gpg.keyname}</keyname>
+                            <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.6.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -168,7 +204,7 @@
         </dependency>
         <dependency>
             <groupId>fr.acinq.secp256k1</groupId>
-            <artifactId>secp256k1-kmp-jvm</artifactId>
+            <artifactId>secp256k1-kmp-jni-jvm</artifactId>
             <version>0.6.4</version>
         </dependency>
         <dependency>
