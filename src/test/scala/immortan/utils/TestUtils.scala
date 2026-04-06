@@ -33,6 +33,13 @@ object TestUtils {
         throw exception
     }
 
+  def isReachable(host: String, port: Int, timeoutMs: Int = 3000): Boolean =
+    Try {
+      val s = new Socket
+      s.connect(new InetSocketAddress(host, port), timeoutMs)
+      s.close()
+    }.isSuccess
+
   class RequestsConnectionProvider extends ConnectionProvider {
     override val proxyAddress: Option[InetSocketAddress] = Option.empty
     override def doWhenReady(action: => Unit): Unit = action
