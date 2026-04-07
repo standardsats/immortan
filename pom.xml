@@ -108,13 +108,14 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>java</executable>
+                            <executable>${java.home}/bin/java</executable>
                             <arguments>
                                 <argument>-classpath</argument>
                                 <classpath/>
                                 <argument>testrunner.UTestRunner</argument>
                             </arguments>
                             <classpathScope>test</classpathScope>
+                            <skip>${skipTests}</skip>
                         </configuration>
                     </execution>
                 </executions>
