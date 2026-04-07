@@ -95,7 +95,29 @@
                 </executions>
             </plugin>
 
-            <!-- utest has no Maven integration; run via its main-class runner -->
+            <!-- Build the dependency classpath into a property before test phase -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-test-classpath</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>build-classpath</goal>
+                        </goals>
+                        <configuration>
+                            <outputProperty>test.deps.classpath</outputProperty>
+                            <includeScope>test</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- utest has no Maven integration; run via its main-class runner.
+                 exec:exec spawns a child JVM (full isolation, proper exit code).
+                 Classpath is built explicitly to guarantee target/test-classes
+                 is included on any CI environment. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -111,10 +133,9 @@
                             <executable>${java.home}/bin/java</executable>
                             <arguments>
                                 <argument>-classpath</argument>
-                                <classpath/>
+                                <argument>${project.build.testOutputDirectory}${path.separator}${project.build.outputDirectory}${path.separator}${test.deps.classpath}</argument>
                                 <argument>testrunner.UTestRunner</argument>
                             </arguments>
-                            <classpathScope>test</classpathScope>
                             <skip>${skipTests}</skip>
                         </configuration>
                     </execution>
