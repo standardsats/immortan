@@ -563,7 +563,7 @@ object MPPSpec extends TestSuite {
         results.size == 1
       }
     }
-
+    // Apr 2026, flaky
     test("Handle multiple competing payments") {
       LNParams.secret = WalletSecret.random()
       val (_, _, _, cm) = makeChannelMasterWithBasicGraph(Nil)

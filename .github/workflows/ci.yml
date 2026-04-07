@@ -14,6 +14,6 @@ jobs:
           java-version: 11
           cache: maven
       - name: test compile
-        run: mvn clean test-compile dependency:build-classpath -Dmdep.outputFile=cp.txt
+        run: mvn clean test-compile dependency:build-classpath
       - name: unit tests
-        run: java -cp "target/classes:target/test-classes:$(cat cp.txt)" testrunner.UTestRunner
+        run: mvn test -Dtest=testrunner.UTestRunner
