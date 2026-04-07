@@ -657,16 +657,18 @@ object MPPSpec extends TestSuite {
       cm.opm process send3
 
       WAIT_UNTIL_TRUE {
+        val senders = cm.opm.data.paymentSenders
+
         // First one enjoys full channel capacity
-        val ws1 = cm.opm.data.paymentSenders(tag1).data.parts.values.collect {
-          case inFlight: WaitForRouteOrInFlight => inFlight
-        }
+        val ws1 = senders.get(tag1).toSeq.flatMap(
+          _.data.parts.values.collect { case inFlight: WaitForRouteOrInFlight => inFlight }
+        )
         assert(Set(MilliSatoshi(300000L)) == ws1.map(_.amount).toSet)
 
         // Second one had to be split to get through
-        val ws2 = cm.opm.data.paymentSenders(tag2).data.parts.values.collect {
-          case inFlight: WaitForRouteOrInFlight => inFlight
-        }
+        val ws2 = senders.get(tag2).toSeq.flatMap(
+          _.data.parts.values.collect { case inFlight: WaitForRouteOrInFlight => inFlight }
+        )
         assert(
           Set(
             MilliSatoshi(150000L),
@@ -675,8 +677,8 @@ object MPPSpec extends TestSuite {
           ) == ws2.map(_.amount).toSet
         )
 
-        // Third one has been knocked out
-        cm.opm.data.paymentSenders(tag3).state == PaymentStatus.ABORTED
+        // Third one has been knocked out (ABORTED or already cleaned up after abort)
+        senders.get(tag3).forall(_.state == PaymentStatus.ABORTED)
       }
     }
 
