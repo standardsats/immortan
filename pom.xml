@@ -105,10 +105,15 @@
                         <id>run-tests</id>
                         <phase>test</phase>
                         <goals>
-                            <goal>java</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <mainClass>testrunner.UTestRunner</mainClass>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-classpath</argument>
+                                <classpath/>
+                                <argument>testrunner.UTestRunner</argument>
+                            </arguments>
                             <classpathScope>test</classpathScope>
                         </configuration>
                     </execution>
