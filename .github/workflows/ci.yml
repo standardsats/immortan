@@ -14,4 +14,4 @@ jobs:
           java-version: 11
           cache: maven
       - name: unit tests
-        run: mvn test
+        run: mvn clean package && mvn test
