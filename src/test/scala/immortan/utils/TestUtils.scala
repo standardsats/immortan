@@ -40,6 +40,11 @@ object TestUtils {
       s.close()
     }.isSuccess
 
+  def isHttpReachable(url: String, timeoutMs: Int = 3000): Boolean =
+    Try(requests.get(url, connectTimeout = timeoutMs, readTimeout = timeoutMs))
+      .map(_.statusCode == 200)
+      .getOrElse(false)
+
   class RequestsConnectionProvider extends ConnectionProvider {
     override val proxyAddress: Option[InetSocketAddress] = Option.empty
     override def doWhenReady(action: => Unit): Unit = action

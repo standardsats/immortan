@@ -160,13 +160,10 @@ trait Channel
         val t = new java.util.Timer(true) // daemon: won't block JVM shutdown
         val task = new java.util.TimerTask {
           def run() = {
-            val saved = lastSeenBlockCount
             // Propagate subsequent block counts right away
             useDelay = false
             lastSeenBlockCount = None
             t.cancel() // release timer thread after this one-shot task
-            // Propagate the last delayed block count
-            saved.foreach(process)
           }
         }
         t.schedule(task, 10000L)
