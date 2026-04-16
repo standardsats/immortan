@@ -9,13 +9,10 @@ import fr.acinq.eclair.blockchain.fee.{
   FeeratesPerKB
 }
 import immortan.utils.FeeRates._
-import immortan.utils.TestUtils._
-import immortan.utils.{BitgoFeeProvider, EsploraFeeProvider}
+import immortan.utils.{BitGoFeeRateStructure, BitgoFeeProvider, EsploraFeeProvider}
 import utest._
 
 object FeeRatesSpec extends TestSuite {
-  LNParams.connectionProvider = new RequestsConnectionProvider
-
   val tests = Tests {
     test("Provider APIs are correctly parsed") {
       // Live network test: skip gracefully on any network or data issue
