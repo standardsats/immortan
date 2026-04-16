@@ -157,15 +157,13 @@ trait Channel
     def run(msg: Any): Unit = msg match {
       case currentBlockCount: CurrentBlockCount
           if lastSeenBlockCount.isEmpty && useDelay => {
-        val t = new java.util.Timer()
+        val t = new java.util.Timer(true) // daemon: won't block JVM shutdown
         val task = new java.util.TimerTask {
           def run() = {
             // Propagate subsequent block counts right away
             useDelay = false
             lastSeenBlockCount = None
-            // Popagate the last delayed block count
-            lastSeenBlockCount.foreach(process)
-
+            t.cancel() // release timer thread after this one-shot task
           }
         }
         t.schedule(task, 10000L)

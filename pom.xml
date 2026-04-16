@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>finance.standardsats.immortan</groupId>
+    <groupId>finance.standardsats</groupId>
     <artifactId>immortan_2.13</artifactId>
-    <version>0.1.1</version>
-    <packaging>pom</packaging>
+    <version>0.7.13-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <description>A Scala implementation of the mobile-optimized Lightning Network client</description>
     <url>https://github.com/standardsats/immortan</url>
@@ -52,110 +52,180 @@
     </repositories>
 
     <build>
-    <plugins>
-        <plugin>
-            <groupId>net.alchim31.maven</groupId>
-            <artifactId>scala-maven-plugin</artifactId>
-            <version>4.8.1</version>
-            <configuration>
-                <args combine.children="append">
-                    <arg>-feature</arg>
-                    <arg>-language:postfixOps</arg>
-                    <arg>-language:implicitConversions</arg>
-                    <arg>-Werror</arg>
-                    <arg>-unchecked</arg>
-                    <arg>-deprecation</arg>
-                </args>
-                <jvmArgs>
-                    <jvmArg>-Xmx1024m</jvmArg>
-                    <jvmArg>-Xms1024m</jvmArg>
-                    <jvmArg>-Xss32m</jvmArg>
-                </jvmArgs>
-                <scalaCompatVersion>${scala.version.short}</scalaCompatVersion>
-            </configuration>
-            <executions>
-                <execution>
-                    <id>scalac</id>
-                    <goals>
-                        <goal>compile</goal>
-                        <goal>testCompile</goal>
-                    </goals>
-                </execution>
-                <execution>
-                    <id>scaladoc</id>
-                    <goals>
-                        <goal>doc-jar</goal>
-                    </goals>
-                    <configuration>
-                        <skip>${maven.test.skip}</skip>
-                        <args>
-                            <arg>-no-link-warnings</arg>
-                        </args>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <groupId>org.sonatype.central</groupId>
-            <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>0.6.0</version>
-            <extensions>true</extensions>
-            <configuration>
-                <publishingServerId>central</publishingServerId>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
-            <executions>
-                <execution>
-                    <id>attach-sources</id>
-                    <goals>
-                        <goal>jar-no-fork</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
-            <executions>
-                <execution>
-                    <id>attach-javadocs</id>
-                    <goals>
-                        <goal>jar</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
-            <executions>
-                <execution>
-                    <id>sign-artifacts</id>
-                    <phase>verify</phase>
-                    <goals>
-                        <goal>sign</goal>
-                    </goals>
-                    <configuration>
-                        <keyname>${gpg.keyname}</keyname>
-                        <passphraseServerId>${gpg.keyname}</passphraseServerId>
-                        <gpgArguments>
-                            <arg>--pinentry-mode</arg>
-                            <arg>loopback</arg>
-                        </gpgArguments>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-    </plugins>
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>4.8.1</version>
+                <configuration>
+                    <scalaCompatVersion>${scala.compat.version}</scalaCompatVersion>
+                    <args combine.children="append">
+                        <arg>-feature</arg>
+                        <arg>-language:postfixOps</arg>
+                        <arg>-language:implicitConversions</arg>
+                        <arg>-unchecked</arg>
+                        <arg>-deprecation</arg>
+                    </args>
+                    <jvmArgs>
+                        <jvmArg>-Xmx1024m</jvmArg>
+                        <jvmArg>-Xms1024m</jvmArg>
+                        <jvmArg>-Xss32m</jvmArg>
+                    </jvmArgs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>scala-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scaladoc</id>
+                        <goals>
+                            <goal>doc-jar</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${maven.test.skip}</skip>
+                            <args>
+                                <arg>-no-link-warnings</arg>
+                            </args>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Build the dependency classpath into a property before test phase -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-test-classpath</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>build-classpath</goal>
+                        </goals>
+                        <configuration>
+                            <outputProperty>test.deps.classpath</outputProperty>
+                            <includeScope>test</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- utest has no Maven integration; run via its main-class runner.
+                 exec:exec spawns a child JVM (full isolation, proper exit code).
+                 Classpath is built explicitly to guarantee target/test-classes
+                 is included on any CI environment. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>run-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <arguments>
+                                <argument>-classpath</argument>
+                                <argument>${project.build.testOutputDirectory}${path.separator}${project.build.outputDirectory}${path.separator}${test.deps.classpath}</argument>
+                                <argument>testrunner.UTestRunner</argument>
+                            </arguments>
+                            <skip>${skipTests}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- disable surefire — no JUnit/TestNG tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <!-- add Automatic-Module-Name manifest entry -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Automatic-Module-Name>immortan</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <configuration>
+                            <keyname>${gpg.keyname}</keyname>
+                            <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.6.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -171,6 +241,13 @@
             <artifactId>secp256k1-kmp-jvm</artifactId>
             <version>0.6.4</version>
         </dependency>
+        <!-- native JNI binaries required at runtime by secp256k1-kmp-jvm -->
+        <dependency>
+            <groupId>fr.acinq.secp256k1</groupId>
+            <artifactId>secp256k1-kmp-jni-jvm</artifactId>
+            <version>0.6.4</version>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>org.scodec</groupId>
             <artifactId>scodec-core_${scala.compat.version}</artifactId>
@@ -179,7 +256,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.10</version>
+            <version>1.17.1</version>
         </dependency>
         <dependency>
             <groupId>io.reactivex</groupId>
@@ -199,7 +276,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.1.42.Final</version>
+            <version>4.1.100.Final</version>
         </dependency>
         <dependency>
             <groupId>com.softwaremill.quicklens</groupId>

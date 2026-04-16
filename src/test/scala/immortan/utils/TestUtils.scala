@@ -33,6 +33,18 @@ object TestUtils {
         throw exception
     }
 
+  def isReachable(host: String, port: Int, timeoutMs: Int = 3000): Boolean =
+    Try {
+      val s = new Socket
+      s.connect(new InetSocketAddress(host, port), timeoutMs)
+      s.close()
+    }.isSuccess
+
+  def isHttpReachable(url: String, timeoutMs: Int = 3000): Boolean =
+    Try(requests.get(url, connectTimeout = timeoutMs, readTimeout = timeoutMs))
+      .map(_.statusCode == 200)
+      .getOrElse(false)
+
   class RequestsConnectionProvider extends ConnectionProvider {
     override val proxyAddress: Option[InetSocketAddress] = Option.empty
     override def doWhenReady(action: => Unit): Unit = action
